@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Script Extractor ✨</title>
+    
+    <!-- Google Font for that cool anime look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS for Styling and Animations */
+        :root {
+            --primary-glow: #00f2ff;
+            --secondary-glow: #ff00c1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+            /* Animated Background */
+            background: linear-gradient(-45deg, #0a0218, #1a0a2e, #0c021a, #210535);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(10, 2, 24, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: var(--primary-glow);
+            text-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        input:focus {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px var(--secondary-glow);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            display: none; /* Initially hidden */
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .video-details {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .video-details img {
+            width: 160px;
+            border-radius: 8px;
+        }
+        
+        .video-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .script-box {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+        
+        #statusMsg {
+            text-align: center;
+            margin-top: 15px;
+            height: 20px;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-glow); border-radius: 4px;}
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary-glow); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>YT Script Extractor</h1>
+        
+        <input type="text" id="videoLink" placeholder="Yahan YouTube Video ka Link Paste Karein...">
+        
+        <button id="fetchBtn" onclick="fetchVideoData()">Get Script</button>
+        
+        <p id="statusMsg"></p>
+
+        <div class="result-section" id="resultSection">
+            <div class="video-details">
+                <img id="thumbImg" src="" alt="Thumbnail">
+                <div>
+                    <h3 id="videoTitle"></h3>
+                    <p id="channelName"></p>
+                </div>
+            </div>
+            
+            <h4>Video Script / Description:</h4>
+            <div class="script-box" id="scriptContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+
+        // Aapki API key yahan add kar di gayi hai
+        const apiKey = "AIzaSyDFSfxNBc6aEQrctomHw5PWhMAmM3HIDM4";
+
+        async function fetchVideoData() {
+            const videoUrl = document.getElementById('videoLink').value.trim();
+            const statusMsg = document.getElementById('statusMsg');
+            const resultSection = document.getElementById('resultSection');
+            const fetchBtn = document.getElementById('fetchBtn');
+            
+            if (apiKey === "YOUR_API_KEY_HERE") {
+                statusMsg.style.color = 'red';
+                statusMsg.innerText = 'ERROR: Code ke andar API Key paste nahi ki gayi hai.';
+                return;
+            }
+
+            if (!videoUrl) {
+                statusMsg.style.color = 'orange';
+                statusMsg.innerText = 'Please video link daalein.';
+                return;
+            }
+
+            const videoId = extractVideoId(videoUrl);
+            if (!videoId) {
+                statusMsg.style.color = 'red';
+                statusMsg.innerText = 'Ye YouTube link sahi nahi hai.';
+                return;
+            }
+            
+            // Reset UI
+            statusMsg.style.color = 'white';
+            statusMsg.innerText = 'Fetching data...';
+            fetchBtn.disabled = true;
+            resultSection.style.display = 'none';
+
+            try {
+                const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+                if (data.items.length === 0) {
+                    throw new Error("Video nahi mila. Link check karein.");
+                }
+
+                const snippet = data.items[0].snippet;
+
+                // Populate UI
+                document.getElementById('thumbImg').src = snippet.thumbnails.high.url;
+                document.getElementById('videoTitle').innerText = snippet.title;
+                document.getElementById('channelName').innerText = `Channel: ${snippet.channelTitle}`;
+                
+                // IMPORTANT NOTE: Browser se direct transcript nahi nikal sakte.
+                // Hum yahan video ki description dikha rahe hain.
+                const description = snippet.description;
+                const transcriptNote = "--- \n\n[ZAROORI NOTE]: Browser ki security ki wajah se video ki poori script (transcript) direct nahi nikaali ja sakti. Iske liye Python server zaroori hota hai. Neeche video ki 'Description' dikhayi ja rahi hai.";
+                
+                document.getElementById('scriptContent').innerText = description + "\n\n" + transcriptNote;
+
+         
